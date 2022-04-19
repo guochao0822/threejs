@@ -1,0 +1,109 @@
+<!--
+ * @Description: 
+ * @Version: 2.0
+ * @Autor: GUOCHAO82
+ * @Date: 2022-04-14 16:40:26
+ * @LastEditors: GUOCHAO82
+ * @LastEditTime: 2022-04-14 16:41:45
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+<script src="https://cdn.bootcdn.net/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+    /*
+ * @Description: 
+ * @Version: 2.0
+ * @Autor: GUOCHAO82
+ * @Date: 2022-04-14 10:40:17
+ * @LastEditors: GUOCHAO82
+ * @LastEditTime: 2022-04-14 16:38:03
+ */
+
+// import * as THREE from 'three'
+
+const w = window.innerWidth // 容器宽高
+const h = window.innerHeight 
+const k = w/h // 宽高比
+const S = 200
+// 场景
+const scene = new THREE.Scene()
+
+
+
+const x=0,y=0;
+const radius = 100
+
+const c = 0.552284749831*radius
+
+const shape = new THREE.Shape()
+
+shape.moveTo(x, y+radius/3)
+.bezierCurveTo(x-c,y+radius, x-radius,y+c, x-radius,y)
+.bezierCurveTo(x-radius,y-c, x-c,y-radius/3, x, y-radius)
+.bezierCurveTo(x+c,y-radius/3, x+radius,y-c, x+radius, y)
+.bezierCurveTo(x+radius,y+c, x+c,y+radius, x,y+radius/3)
+
+const geometry = new THREE.ExtrudeGeometry(shape,{
+    depth:100
+})
+
+const material = new THREE.MeshPhongMaterial({
+    color: 0xFF0000,
+    shininess:150,
+})
+
+// 合成物体
+const mesh = new THREE.Mesh(geometry,material)
+
+// 添加到场景中
+scene.add(mesh)
+
+// 添加坐标系
+const axes = new THREE.AxesHelper(w)
+scene.add(axes)
+
+// 点光源
+const point = new THREE.PointLight()
+point.position.set(100,200,300)
+scene.add(point)
+
+//环境光
+// const ambient = new THREE.AmbientLight(0x444444);
+// scene.add(ambient);
+
+
+// 设置相机
+const camera = new THREE.OrthographicCamera(-k*S, k*S, S, -S, 1, 1000)
+camera.position.set(50,100,300)
+camera.lookAt(scene.position)
+
+/**
+ * 创建渲染对象
+ */
+
+const renderer = new THREE.WebGLRenderer()
+// renderer.setClearColor('#fff', 1); //设置背景颜色
+renderer.setSize(w,h)
+document.body.appendChild(renderer.domElement)
+// renderer.render(scene,camera)
+
+
+function render() {
+    renderer.render(scene,camera);//执行渲染操作
+    mesh.rotateY(0.01);//每次绕y轴旋转0.01弧度
+    requestAnimationFrame(render)
+}
+
+render()
+
+</script>
+</html>
