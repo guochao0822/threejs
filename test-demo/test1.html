@@ -1,0 +1,156 @@
+<!--
+ * @Description: 
+ * @Version: 2.0
+ * @Autor: GUOCHAO82
+ * @Date: 2022-04-21 19:05:42
+ * @LastEditors: GUOCHAO82
+ * @LastEditTime: 2022-04-21 19:29:01
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/three@0.129.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.129.0/examples/js/controls/OrbitControls.min.js"></script>
+<script type="module">
+
+class Model {
+    w = 0
+    h = 0
+    k = 0
+    s = 200
+    scene = new THREE.Scene()
+    groups = new THREE.Group()
+    camera = null
+    renderer
+    controls
+
+    constructor(options) {
+        const {
+            w = window.innerWidth,
+            h = window.innerHeight
+        } = options || {}
+        this.w = w
+        this.h = h
+        this.k = w / h
+        const axes = new THREE.AxesHelper(w)
+        this.scene.add(axes)
+        this.scene.add(this.groups)
+    }
+
+    render(model) {
+        model.renderer.render(this.scene, this.camera)
+        model.groups.rotateY(0.001);//每次绕y轴旋转0.01弧度
+        return model
+    }
+    autoLoop(model){
+        this.render(model)
+        requestAnimationFrame(()=>{this.autoLoop(model)})
+        return this
+    }
+    initCamera() {
+        console.log(this.k, '-kkkkkkkkkkk')
+        this.camera = new THREE.PerspectiveCamera(45, this.k, 0.1, 5000)
+        this.camera.position.set(20, 20, 100);
+        this.camera.lookAt(0, 0, 0.01);
+
+        return this
+    }
+
+
+    initLight() {
+        return this
+    }
+
+    initRenderer() {
+        this.renderer = new THREE.WebGLRenderer({
+            antialias: true,
+        })
+
+        this.renderer.shadowMap.enabled = true; // 开启阴影
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        this.renderer.toneMappingExposure = 1.25;
+
+
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        // 清除背景色，透明背景
+        this.renderer.setClearColor(0xffffff, 0);
+        this.renderer.setSize(this.w, this.h);
+        document.body.appendChild(this.renderer.domElement)
+        return this
+    }
+
+    getGeometry(points) {
+        // const shape = new THREE.Shape()
+        // points.forEach((point, index) => {
+        //     if (!index) {
+        //         shape.moveTo(...point)
+        //     } else {
+        //         shape.lineTo(...point)
+        //     }
+        // })
+        const geometry = new THREE.BoxGeometry(20, 20, 20)
+
+        const getUrl = (key)=>`https://park.crc.com.cn/smartPark/park-common/file/getFile?key=${key}`
+        const materials = [
+            new THREE.MeshBasicMaterial({
+                map: new THREE.TextureLoader().load(getUrl('dmMtdXBsb2FkLTE2NTA1Mzg1MTg2MjEtMl8xNjUwNTM4OTM5ODM3'))
+            }),
+            new THREE.MeshBasicMaterial({
+                map: new THREE.TextureLoader().load(getUrl('dmMtdXBsb2FkLTE2NTA1MzgyOTgwNjctNV8xNjUwNTM4NDM4MzE4'))
+            }),
+            new THREE.MeshBasicMaterial({
+                map: new THREE.TextureLoader().load(getUrl("dmMtdXBsb2FkLTE2NTA1Mzg1MTg2MjEtNF8xNjUwNTM4OTc3OTYw"))
+            }),
+            new THREE.MeshBasicMaterial({
+                map: new THREE.TextureLoader().load(getUrl("dmMtdXBsb2FkLTE2NTA1Mzg1MTg2MjEtNl8xNjUwNTM5MDEwNDQ2"))
+            }),
+            new THREE.MeshBasicMaterial({
+                map: new THREE.TextureLoader().load(getUrl("dmMtdXBsb2FkLTE2NTA1Mzg1MTg2MjEtOF8xNjUwNTM5MDMyMDEy"))
+            }),
+            new THREE.MeshBasicMaterial({
+                map: new THREE.TextureLoader().load(getUrl("dmMtdXBsb2FkLTE2NTA1Mzg1MTg2MjEtMTBfMTY1MDUzOTA1MjkyMw=="))
+            })
+        ]
+
+        const mesh = new THREE.Mesh(geometry, materials)
+
+        mesh.geometry.scale(20, 20, -20)
+        mesh.castShadow = true
+        mesh.receiveShadow = true
+        // mesh._color="#fff"
+        this.groups.add(mesh)
+        return this
+    }
+    addControls() {
+        this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement)
+        this.controls.addEventListener('change', () => {
+            this.render(model)
+        })
+        return this
+    }
+
+}
+
+const model = new Model()
+model
+    .initCamera()
+    .initLight()
+    .initRenderer()
+    .getGeometry()
+    .render(model)
+    .addControls()
+    .autoLoop(model)
+</script>
+
+</html>

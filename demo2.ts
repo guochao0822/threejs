@@ -4,7 +4,7 @@
  * @Autor: GUOCHAO82
  * @Date: 2022-04-15 09:47:04
  * @LastEditors: GUOCHAO82
- * @LastEditTime: 2022-04-19 19:45:38
+ * @LastEditTime: 2022-04-21 12:41:39
  */
 import * as THREE from 'three'
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
@@ -46,7 +46,7 @@ camera.lookAt(scene.position)
 
 // 渲染
 const renderer = new THREE.WebGLRenderer({
-    antialias:true,
+    antialias: true,
 })
 renderer.setClearColor('#fff', 1); //设置背景颜色
 renderer.setSize(w, h)
@@ -54,11 +54,6 @@ document.body.appendChild(renderer.domElement)
 
 
 
-
-const material = [
-    new THREE.MeshLambertMaterial({ color: '#86909c', side: THREE.DoubleSide }),         //受光照影响
-    new THREE.MeshBasicMaterial({ color: '#ffece8', side: THREE.DoubleSide, vertexColors: true })            //不受光照影响
-];
 function getGeometry(points, height) {
     let topPoints = [];
     for (let i = 0; i < points.length; i++) {
@@ -109,14 +104,23 @@ function getGeometry(points, height) {
     geometry.computeFaceNormals();      //自动计算法向量
 
     // 物体
+    // console.log(geometry.center()) 
+
+    const material = [
+    new THREE.MeshLambertMaterial({ color: '#86909c', side: THREE.DoubleSide }),         //受光照影响
+    new THREE.MeshBasicMaterial({ color: '#ffece8', side: THREE.DoubleSide, vertexColors: true,map:new THREE.CanvasTexture(getTopTextCanvas()) })            //不受光照影响
+];
+
     const mesh = new THREE.Mesh(geometry.toBufferGeometry(), material)
 
     // border 添加边框
     const edges = new THREE.EdgesGeometry(geometry.toBufferGeometry())
     const border = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 'black' }))
-
+    console.log(new THREE.Box3().expandByObject(mesh).max, 'new THREE.Box3().expandByObject(mesh).min')
     groups.add(mesh)
     groups.add(border)
+
+
     return {
         positonSet: (x, y, z) => {
             // mesh.position.set(x, y, z)
@@ -132,6 +136,48 @@ function getGeometry(points, height) {
     }
 }
 
+// 值作顶部贴图文字
+// function getTopTextCanvas(text,x,z) {
+//     const w = 400
+//     const h = 400
+//     const canvas = document.createElement('canvas')
+//     canvas.width = w
+//     canvas.height = h
+//     const ctx = canvas.getContext('2d')
+//     ctx.fillStyle = '#C3C3C3'
+//     ctx.fillRect(0, 0, w, h)
+//     ctx.font="400px Georgia";
+//     // ctx.fillStyle = '#2891FF'
+//     ctx.fillText('asdfasfdasf', x, z)
+//     return canvas
+// }
+
+
+function getTopTextCanvas(){ 
+    let texts=[{
+        name:"北京",
+        value:323
+    },{
+        name:"杭州",
+        value:121
+    },{
+        name:"南京",
+        value:56
+    }]
+    var width=512, height=256; 
+    var canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#C3C3C3';
+    ctx.fillRect(0, 0, width, height);
+    ctx.font = 32+'px " bold';
+    ctx.fillStyle = '#2891FF';
+    texts.forEach((text,index)=>{
+        ctx.fillText(`${text.name}:${text.value}`, 10, 32 * index + 30);
+    }) 
+    return canvas;
+}
 
 
 
@@ -167,17 +213,17 @@ const groups = new THREE.Group()
 
 // const points = [[0, 0, 0], [0, 0, -100], [50, 0, -100], [50, 0, -80], [70, 0, -80],  [70, 0, -40],  [50, 0, 0]]
 const points = {
-    603:[[0, 0, 0],[200, 0, 0],[200, 0, 80],[0, 0, 80]],
-    601:[[0, 0, 0],[60, 0, 0],[60, 0, 80],[0, 0, 80]],
-    606:[[0, 0, 0],[60, 0, 0],[60, 0, 200],[0, 0, 200]],
-    605:[[30, 0, 30],[30, 0, 0],[200, 0, 0],[200, 0, 200],[0, 0, 200],[0, 0, 30]],
-    
+    603: [[0, 0, 0], [200, 0, 0], [200, 0, 80], [0, 0, 80]],
+    601: [[0, 0, 0], [60, 0, 0], [60, 0, 80], [0, 0, 80]],
+    606: [[0, 0, 0], [60, 0, 0], [60, 0, 200], [0, 0, 200]],
+    605: [[30, 0, 30], [30, 0, 0], [200, 0, 0], [200, 0, 200], [0, 0, 200], [0, 0, 30]],
+
 }
 getGeometry(points[603], 10)
-getGeometry(points[603], 10).positonSet(204,0,0)
-getGeometry(points[601], 10).positonSet(200*2+8,0,0)
-getGeometry(points[606], 10).positonSet(0,0,-240)
-getGeometry(points[605], 10).positonSet(268,0,-240)
+getGeometry(points[603], 10).positonSet(204, 0, 0)
+getGeometry(points[601], 10).positonSet(200 * 2 + 8, 0, 0)
+getGeometry(points[606], 10).positonSet(0, 0, -240)
+getGeometry(points[605], 10).positonSet(268, 0, -240)
 
 // getGeometry(points, 10).positonSet(80,0,0)
 // const borders = getBorderGeometry(topPoints, 'red')
@@ -194,9 +240,9 @@ getGeometry(points[605], 10).positonSet(268,0,-240)
 //     console.log(center,'---center')
 // })
 
-groups.translateX(-200)
-groups.translateZ(80)
-
+// groups.translateX(-200)
+// groups.translateZ(80)
+groups.position.set(-200, 0, 80)
 // console.log(scene.cen,'----position')
 
 scene.add(groups)

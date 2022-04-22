@@ -4,7 +4,7 @@
  * @Autor: GUOCHAO82
  * @Date: 2022-04-15 15:12:31
  * @LastEditors: GUOCHAO82
- * @LastEditTime: 2022-04-21 20:05:11
+ * @LastEditTime: 2022-04-21 19:53:11
  */
 
 import * as THREE from 'three'
@@ -56,36 +56,18 @@ class Model {
         this.camera = new THREE.PerspectiveCamera(45, this.k, 0.1, 5000)
         this.camera.position.set(20, -80, 200);
         this.camera.lookAt(0, 0, 0.01);
-        // this.camera.position.set(0, -200, 400)
-        // this.camera.lookAt(this.scene.position)
-        // this.camera = new THREE.PerspectiveCamera(45, k, 0.1, 5000);
-        // this.camera.position.set(0, -40, 70);
-        // this.camera.lookAt(this.scene.position);
+
         return this
     }
 
 
     initLight() {
         const point = new THREE.PointLight()
-        const ambient = new THREE.AmbientLight(0x444444);
-        this.scene.add(ambient);
-        // const point = new THREE.DirectionalLight( 0xffffff, 0.5 ); 
-        // point.position.set(0, 2000, 0)
         point.position.set(60, 100, 200);
-        // const ambient = new THREE.AmbientLight('#fff');
-        point.castShadow = true;
-        point.shadow.mapSize.width = 1024;
-        point.shadow.mapSize.height = 1024;
-        // this.scene.add(ambient);
         this.scene.add(point)
 
-        // const light = new THREE.DirectionalLight(0xffffff, 0.5);
-        // light.position.set(20, 50, 20);
-        // light.castShadow = true;
-        // light.shadow.mapSize.width = 1024;
-        // light.shadow.mapSize.height = 1024;
-
-        // this.scene.add(light);
+        const ambient = new THREE.AmbientLight(0x444444);
+        this.scene.add(ambient);
 
         return this
     }
@@ -94,17 +76,7 @@ class Model {
         this.renderer = new THREE.WebGLRenderer({
             antialias: true,
         })
-        // this.renderer.setClearColor('#fff', 1); //设置背景颜色
-        // this.renderer.setSize(w, h)
-        this.renderer.shadowMap.enabled = true; // 开启阴影
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.renderer.toneMappingExposure = 1.25;
 
-        // 根据自己的需要调整颜色模式
-        // this.renderer.outputEncoding = THREE.sRGBEncoding;  
-
-        // this.renderer.outputEncoding = THREE.sHSVEncoding;
         this.renderer.setPixelRatio(window.devicePixelRatio);
         // 清除背景色，透明背景
         this.renderer.setClearColor(0xffffff, 0);
@@ -114,69 +86,67 @@ class Model {
     }
 
     getGeometry(points: [number, number][]) {
-        const shape = new THREE.Shape()
-        points.forEach((point, index) => {
-            if (!index) {
-                shape.moveTo(...point)
-            } else {
-                shape.lineTo(...point)
-            }
-        })
+        // const shape = new THREE.Shape()
+        // points.forEach((point, index) => {
+        //     if (!index) {
+        //         shape.moveTo(...point)
+        //     } else {
+        //         shape.lineTo(...point)
+        //     }
+        // })
 
-        const geometry = new THREE.ExtrudeGeometry(shape, {
-            // steps: 2,
-            // depth: 16,
-            // bevelEnabled: true,
-            // bevelThickness: 1,
-            // bevelSize: 1,
-            // bevelSegments: 1
-            // amount: 8,
-            depth: 40,
-            bevelEnabled: true,
-            // bevelSegments: 1,
-            bevelThickness: 0.2
-            // UVGenerator:
-        })
-
-        // const map = new THREE.TextureLoader().load("./xxx.jpg",(a)=>{
-        //     console.log(a,'a')
-        // },(e)=>{
-        //     console.log(e,'---e')
-        // },(e)=>{
-        //     console.log(e,'error')
-        // });
-        // 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' 
-        // const geometry = new THREE.SphereGeometry(20, 20, 20)
-        // const geometry = new THREE.BoxGeometry(20, 20, 20)
+        // const geometry = new THREE.ExtrudeGeometry(shape, {
+        //     // steps: 2,
+        //     // depth: 16,
+        //     // bevelEnabled: true,
+        //     // bevelThickness: 1,
+        //     // bevelSize: 1,
+        //     // bevelSegments: 1
+        //     // amount: 8,
+        //     depth: 40,
+        //     bevelEnabled: true,
+        //     // bevelSegments: 1,
+        //     bevelThickness: 0.2
+        //     // UVGenerator:
+        // })
 
 
+        // const materials = [
+        //     new THREE.MeshBasicMaterial({
+        //         // metalness: 1,
+        //         // map: new THREE.CanvasTexture(this.getTopTextCanvas()),
+        //         // map: new THREE.TextureLoader().load("./xxx.jpg")
+        //         // map:new THREE.TextureLoader().load("./nx.jpg")
+        //         color: '#ffece8'
+        //     }),
+        //     new THREE.MeshBasicMaterial({
+        //         // metalness: 1,
+        //         // roughness: 1,
+        //         color: 'green',
+        //     })
+        // ]
 
-        const materials = [
-            new THREE.MeshPhongMaterial({
-                // metalness: 1,
-                // map: new THREE.CanvasTexture(this.getTopTextCanvas()),
-                // map: new THREE.TextureLoader().load("./xxx.jpg")
-                // map:new THREE.TextureLoader().load("./nx.jpg")
-                // color: '#ffece8'
-                map: this.getSprite()
-            }),
-            new THREE.MeshBasicMaterial({
-                // metalness: 1,
-                // roughness: 1,
-                color: 'green',
-            })
-        ]
-
-
-
-        // const materials = new THREE.MeshBasicMaterial( { map: new THREE.CanvasTexture(this.getTopTextCanvas()) } ) // top
-        const mesh = new THREE.Mesh(geometry, materials)
-        this.groups.add(mesh)
-        mesh.castShadow = true
-        mesh.receiveShadow = true
-        // mesh._color="#fff"
-        // this.groups.add(mesh)
+        // const mesh = new THREE.Mesh(geometry,materials)
+        // // this.groups.add(mesh)
+        // mesh.castShadow = true
+        // mesh.receiveShadow = true
         // this.getSprite()
+        // return this
+        var canvas = document.createElement("canvas");
+        var ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#0000ff";
+        ctx.font = "20px Arial";
+        ctx.lineWidth = 1;
+        ctx.fillText("ABCDRE", 4, 20);
+        var texture = new THREE.Texture(canvas);
+        texture.needsUpdate = true;
+
+        //使用Sprite显示文字
+        var material = new THREE.SpriteMaterial({ map: texture });
+        var textObj = new THREE.Sprite(material);
+        textObj.scale.set(100, 100, 100);
+        textObj.position.set(4, -4, 1);
+        this.groups.add(textObj);
         return this
     }
     addControls() {
@@ -216,24 +186,20 @@ class Model {
 
     getSprite() {
         var canvas = document.createElement("canvas");
-        canvas.width = 1000
-        canvas.height = 1000
         var ctx = canvas.getContext("2d");
-        ctx.fillStyle = "#fff";
+        ctx.fillStyle = "#0000ff";
         ctx.font = "20px Arial";
         ctx.lineWidth = 1;
-        ctx.fillText("ABCDRE", 4, 200);
+        ctx.fillText("ABCDRE", 4, 20);
         var texture = new THREE.Texture(canvas);
         texture.needsUpdate = true;
 
         //使用Sprite显示文字
-        // var material = new THREE.SpriteMaterial({ map: texture });
-        // var textObj = new THREE.Sprite(material);
-        // textObj.scale.set(100, 100, 100);
-        // textObj.position.set(60, 15, -20);
-        // this.groups.add(textObj);
-        return texture
-
+        var material = new THREE.SpriteMaterial({ map: texture });
+        var textObj = new THREE.Sprite(material);
+        textObj.scale.set(1, 1, 1);
+        textObj.position.set(4, -4, 1);
+        this.groups.add(textObj);
     }
 }
 
